@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="javascripts/script.js"></script>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+
+  </head>
+  <body>
+  <div class="container">
+    <div class="row">
+        <input type="button" id="startNewGame" value="Nowa gra" class="btn primary-btn">
+         Rozmiar:<input id="size" type="number" min="3" max="15" value="4" >
+         Z kim?
+         <select>
+            <option value="0">Komputer</option>
+            <option value="1">Inny gracz</option>
+         </select>
+         Głębokość:<input id="depth" type="number" value="4" min="0">
+         Algorytm:
+         <select id="minMax">
+             <option value="0">alfabeta</option>
+             <option value="1">minmax</option>
+         </select>
+          Sposób oceny pozycji:
+          <select id="eval">
+              <option value="0">Różnica punktów</option>
+          </select>
+          </br>
+    </div>
+    <div class="row">
+
+            <div id="pts0" class="points col-sm-1">
+                0
+           </div>
+           <div class=" points col-sm-1">
+            :
+           </div>
+           <div id="pts1" class="points col-sm-1">
+                0
+           </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-8 col-sm-offset-3">
+
+              <table id="board" >
+               </table>
+
+        </div>
+    </div>
+  </div>
+
+
+  </body>
+</html>
