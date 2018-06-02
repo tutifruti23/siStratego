@@ -9,11 +9,11 @@ router.get('/', function(req, res, next) {
 router.get('/compMove', function(req, res, next) {
 
     console.log("zapytanie o ruch");
-    console.log(req.query.isMinMax);
-    console.log(req.query.eval);
-    console.log(req.query.turn)
-   var move=addon.pow(req.query.position,req.query.size,0,0,req.query.depth);
-    console.log("ruch "+move);
-    res.send( move.toString());
+    if(req.query.position.includes('0')){
+        var move=addon.pow(req.query.position,req.query.size,req.query.pts1,req.query.pts2,req.query.depth,req.query.eval,req.query.isMinMax,req.query.turn);
+        console.log("ruch "+move);
+        res.send( move.toString());
+    }
+
 });
 module.exports = router;

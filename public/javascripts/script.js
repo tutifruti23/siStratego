@@ -1,21 +1,24 @@
+var gra;
 $(function(){
     $("#startNewGame").on("click",function(){
         var $size=document.getElementById("size").value;
         var depth=document.getElementById("depth").value;
         var isMinMax=document.getElementById("minMax").value;
         var eval=document.getElementById("eval").value
-        var gra=new Game($size);
+        gra=new Game($size);
         gra.initBoard();
-        gra.depth=depth;
-        gra.isMinMax=isMinMax;
-        gra.eval=eval;
+        gra.engine0.depth=depth;
+        gra.engine0.isMinMax=isMinMax;
+        gra.engine0.eval=eval;
         gra.initGame();
         gra.load();
-
     });
-
-
 });
+function Engine(d,e,imm){
+    this.depth=d;
+    this.eval=e;
+    this.isMinMax=imm;
+}
 function Game(size){
     this.pts0=0;
     this.pts1=0;
@@ -23,9 +26,7 @@ function Game(size){
     this.turn=0;
     this.player=0;
     this.position={};
-    this.eval=0;
-    this.depth=5;
-    this.isMinMax=0;
+    this.engine0=new Engine(0,0,0);
     this.analisis=0;
     this.initBoard=function(){
         for(var i=0;i<size*size;i++){
@@ -157,7 +158,7 @@ function Game(size){
                 this.turn=0;
             }
             if(this.turn!=this.player){
-                this.compMove();
+                this.compMove(this.engine0);
 
             }
         }
@@ -175,7 +176,7 @@ function Game(size){
         $("#pts0").html("").html(handle.pts0);
         $("#pts1").html("").html(handle.pts1);
     }
-    this.compMove=function(){
+    this.compMove=function(engine){
         var handle=this;
         var xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function() {
@@ -184,7 +185,7 @@ function Game(size){
                 handle.load();
             }
         };
-        xhttp.open("GET", "/compMove?position="+handle.positionToString()+"&eval="+handle.eval+"&isMinMax="+handle.isMinMax+"&depth="+handle.depth+"&size="+handle.size+"&turn="+handle.turn, true);
+        xhttp.open("GET", "/compMove?position="+handle.positionToString()+"&pts1="+handle.pts0+"&pts2="+handle.pts1+"&eval="+engine.eval+"&isMinMax="+engine.isMinMax+"&depth="+engine.depth+"&size="+handle.size+"&turn="+handle.turn, true);
         xhttp.send();
     };
     this.positionToString=function(){

@@ -1,7 +1,6 @@
 #include <cmath>
 #include <nan.h>
 #include <string>
-using namespace std;
 #include <vector>
 #include <algorithm>
 bool *arrayCopy(bool *array, int size) {
@@ -21,8 +20,21 @@ std::vector<int> availablesMoves(bool* position, int &size) {
 	}
 	return freeSquares;
 }
-int eval(bool *postion, int &playerPoints, int &oppPoints) {
-	return playerPoints-oppPoints;
+int eval(bool *postion,int &size, int &playerPoints, int &oppPoints,int &whichEval,bool playerTurn) {
+	if (whichEval == 0) {
+		return playerPoints - oppPoints;
+	}
+	else {
+		int half = 2 * size*size - 2;
+		if (playerPoints > half)
+			return 1000;
+		else if (oppPoints > half)
+			return -1000;
+		else {
+			return playerPoints - oppPoints;
+		}
+	}
+
 }
 
 void makeMove(bool* position, int &playerPoints, int &oppPoints, int move, int size, bool playerTurn) {
@@ -129,10 +141,10 @@ void makeMove(bool* position, int &playerPoints, int &oppPoints, int move, int s
 	}
 
 }
-int minMax(bool* position,std::vector<int> &moveList,int playerPoints,int oppPoints,int &boardSize,int moveListSize,int depth,bool maximize ) {
+int minMax(bool* position,std::vector<int> &moveList,int playerPoints,int oppPoints,int &boardSize,int moveListSize,int depth,bool maximize, int whichEval) {
 	if (depth == 0||moveListSize==0) {
 
-		return eval(position,playerPoints,oppPoints);
+		return eval(position,boardSize,playerPoints,oppPoints, whichEval,maximize);
 	}
 	if(maximize){
 		int maxValue =-1000;
@@ -143,7 +155,7 @@ int minMax(bool* position,std::vector<int> &moveList,int playerPoints,int oppPoi
 			int tempOppPoints = oppPoints;
 			makeMove(tempPos,tempPlayerPoints,tempOppPoints,temp[i],boardSize,true);
 			temp.erase(temp.begin()+i);
-			maxValue = max(maxValue,minMax(tempPos,temp, tempPlayerPoints, tempOppPoints,boardSize,moveListSize-1,depth-1,false));
+			maxValue = max(maxValue,minMax(tempPos,temp, tempPlayerPoints, tempOppPoints,boardSize,moveListSize-1,depth-1,false, whichEval));
 			delete tempPos;
 		}
 		return maxValue;
@@ -157,16 +169,16 @@ int minMax(bool* position,std::vector<int> &moveList,int playerPoints,int oppPoi
 			int tempOppPoints = oppPoints;
 			makeMove(tempPos, tempPlayerPoints, tempOppPoints, temp[i],boardSize,false);
 			temp.erase(temp.begin() + i);
-			minValue = min(minValue, minMax(tempPos, temp,tempPlayerPoints, tempOppPoints, boardSize, moveListSize - 1, depth - 1,true));
+			minValue = min(minValue, minMax(tempPos, temp,tempPlayerPoints, tempOppPoints, boardSize, moveListSize - 1, depth - 1,true, whichEval));
 			delete tempPos;
 		}
 		return minValue;
 	}
 }
-int alphaBeta(bool* position, std::vector<int> &moveList, int playerPoints, int oppPoints, int &boardSize, int moveListSize, int depth, bool maximize, int alpha, int beta) {
+int alphaBeta(bool* position, std::vector<int> &moveList, int playerPoints, int oppPoints, int &boardSize, int moveListSize, int depth, bool maximize,int whichEval, int alpha, int beta) {
 	if (depth == 0 || moveListSize == 0) {
 
-		return eval(position, playerPoints, oppPoints);
+		return eval(position,boardSize, playerPoints, oppPoints, whichEval,maximize);
 	}
 	if (maximize) {
 		int maxValue =-1000;
@@ -177,7 +189,7 @@ int alphaBeta(bool* position, std::vector<int> &moveList, int playerPoints, int 
 			int tempOppPoints = oppPoints;
 			makeMove(tempPos, tempPlayerPoints, tempOppPoints, temp[i], boardSize, true);
 			temp.erase(temp.begin() + i);
-			maxValue = max(maxValue, alphaBeta(tempPos, temp, tempPlayerPoints, tempOppPoints, boardSize, moveListSize - 1, depth - 1, false,alpha,beta));
+			maxValue = max(maxValue, alphaBeta(tempPos, temp, tempPlayerPoints, tempOppPoints, boardSize, moveListSize - 1, depth - 1, false, whichEval,alpha,beta));
 			delete tempPos;
 			alpha = max(maxValue, alpha);
 			if (beta <= alpha)
@@ -194,7 +206,7 @@ int alphaBeta(bool* position, std::vector<int> &moveList, int playerPoints, int 
 			int tempOppPoints = oppPoints;
 			makeMove(tempPos, tempPlayerPoints, tempOppPoints, temp[i], boardSize, false);
 			temp.erase(temp.begin() + i);
-			minValue = min(minValue, alphaBeta(tempPos, temp, tempPlayerPoints, tempOppPoints, boardSize, moveListSize - 1, depth - 1, true,alpha,beta));
+			minValue = min(minValue, alphaBeta(tempPos, temp, tempPlayerPoints, tempOppPoints, boardSize, moveListSize - 1, depth - 1, true, whichEval,alpha,beta));
 			delete tempPos;
 			beta = min(minValue, beta);
 			if (beta <= alpha)
@@ -203,7 +215,7 @@ int alphaBeta(bool* position, std::vector<int> &moveList, int playerPoints, int 
 		return minValue;
 	}
 }
-int findBestMove(bool* position, int playerPoints, int oppPoints, int depth,bool playerTurn,int boardSize,bool isMinMax) {
+int findBestMove(bool* position, int playerPoints, int oppPoints, int depth,bool playerTurn,int boardSize,bool isMinMax,int whichEval) {
 	std::vector<int> moves = availablesMoves(position, boardSize);
 	int movesSize = moves.size();
 	int bestIndex = -1;
@@ -217,12 +229,12 @@ int findBestMove(bool* position, int playerPoints, int oppPoints, int depth,bool
 			tempMoves.erase(tempMoves.begin() + i);
 			int tempPlayerPoints = playerPoints;
 			int tempOppPoints = oppPoints;
-			makeMove(tempPos,tempPlayerPoints, tempOppPoints, moves[i], boardSize, true);
+			makeMove(tempPos, tempPlayerPoints, tempOppPoints, moves[i], boardSize, true);
 			if (isMinMax) {
-				moveEval = minMax(tempPos, tempMoves, tempPlayerPoints, tempOppPoints, boardSize, movesSize - 1, depth, false);
+				moveEval = minMax(tempPos, tempMoves, tempPlayerPoints, tempOppPoints, boardSize, movesSize - 1, depth, false, whichEval);
 			}
 			else {
-				moveEval = alphaBeta(tempPos, tempMoves, tempPlayerPoints, tempOppPoints, boardSize, movesSize - 1, depth, false, -1000,+1000);
+				moveEval = alphaBeta(tempPos, tempMoves, tempPlayerPoints, tempOppPoints, boardSize, movesSize - 1, depth, false, whichEval, -1000,+1000);
 			}
 
 			if (moveEval > bestScore) {
@@ -230,7 +242,6 @@ int findBestMove(bool* position, int playerPoints, int oppPoints, int depth,bool
 				bestIndex = i;
 			}
 		}
-
 	}
 	else {
 		int bestScore = 1000;
@@ -243,10 +254,10 @@ int findBestMove(bool* position, int playerPoints, int oppPoints, int depth,bool
 			int tempOppPoints = oppPoints;
 			makeMove(tempPos, tempPlayerPoints, tempOppPoints, moves[i], boardSize,false);
 			if (isMinMax) {
-				moveEval = minMax(tempPos, tempMoves, tempPlayerPoints, tempOppPoints, boardSize, movesSize - 1, depth, true);
+				moveEval = minMax(tempPos, tempMoves, tempPlayerPoints, tempOppPoints, boardSize, movesSize - 1, depth, true, whichEval);
 			}
 			else {
-				moveEval = alphaBeta(tempPos, tempMoves, tempPlayerPoints, tempOppPoints, boardSize, movesSize - 1, depth, true,-1000,1000);
+				moveEval = alphaBeta(tempPos, tempMoves, tempPlayerPoints, tempOppPoints, boardSize, movesSize - 1, depth, true,whichEval,-1000,1000);
 			}
 			if (moveEval < bestScore) {
 				bestScore = moveEval;
@@ -255,11 +266,12 @@ int findBestMove(bool* position, int playerPoints, int oppPoints, int depth,bool
 
 		}
 	}
+
 	return moves[bestIndex];
 }
 void Pow(const Nan::FunctionCallbackInfo<v8::Value>& info) {
 
-    if (info.Length() < 5) {
+    if (info.Length() < 8) {
         Nan::ThrowTypeError("Wrong number of arguments");
         return;
     }
@@ -276,6 +288,9 @@ void Pow(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     int pts1=info[2]->NumberValue();
     int pts2=info[3]->NumberValue();
     int depth=info[4]->NumberValue();
+    int eval=info[5]->NumberValue();
+    int isMinMax=info[6]->NumberValue();
+    int turn=info[7]->NumberValue();
     bool *board=new bool[size];
     for(int i=0;i<size;i++){
         if(pos.at(i)=='1')
@@ -284,7 +299,7 @@ void Pow(const Nan::FunctionCallbackInfo<v8::Value>& info) {
             board[i]=false;
         }
     }
-    v8::Local<v8::Number> num = Nan::New(findBestMove(board,pts1,pts2,depth,false,size,false));
+    v8::Local<v8::Number> num = Nan::New(findBestMove(board,pts1,pts2,depth,turn,size,isMinMax,eval));
 
     info.GetReturnValue().Set(num);
 }
