@@ -18,6 +18,9 @@ $(function(){
         gra.engine0.depth=depth;
         gra.engine0.isMinMax=isMinMax;
         gra.engine0.eval=eval;
+        gra.engine1.depth=depth1;
+        gra.engine1.isMinMax=isMinMax1;
+        gra.engine1.eval=eval1;
         gra.initBoard();
         gra.initGame();
         gra.load();
@@ -69,7 +72,7 @@ function Game(size){
             });
         });
         if(this.rodzaj==2){
-            this.compMove(this.engine0);
+            //this.compMove(this.engine0);
         }
     };
     this.nextGame=function(){

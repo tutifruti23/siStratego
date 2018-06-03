@@ -234,7 +234,7 @@ int findBestMove(bool* position, int playerPoints, int oppPoints, int depth,bool
 				moveEval = minMax(tempPos, tempMoves, tempPlayerPoints, tempOppPoints, boardSize, movesSize - 1, depth, false, whichEval);
 			}
 			else {
-				moveEval = alphaBeta(tempPos, tempMoves, tempPlayerPoints, tempOppPoints, boardSize, movesSize - 1, depth, false, whichEval, -1000,+1000);
+				moveEval = alphaBeta(tempPos, tempMoves, tempPlayerPoints, tempOppPoints, boardSize, movesSize - 1, depth, false, whichEval,  bestScore,+1000);
 			}
 
 			if (moveEval > bestScore) {
@@ -257,7 +257,7 @@ int findBestMove(bool* position, int playerPoints, int oppPoints, int depth,bool
 				moveEval = minMax(tempPos, tempMoves, tempPlayerPoints, tempOppPoints, boardSize, movesSize - 1, depth, true, whichEval);
 			}
 			else {
-				moveEval = alphaBeta(tempPos, tempMoves, tempPlayerPoints, tempOppPoints, boardSize, movesSize - 1, depth, true,whichEval,-1000,1000);
+				moveEval = alphaBeta(tempPos, tempMoves, tempPlayerPoints, tempOppPoints, boardSize, movesSize - 1, depth, true,whichEval,-1000, bestScore);
 			}
 			if (moveEval < bestScore) {
 				bestScore = moveEval;
