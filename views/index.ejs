@@ -15,10 +15,12 @@
         <input type="button" id="startNewGame" value="Nowa gra" class="btn primary-btn">
          Rozmiar:<input id="size" type="number" min="3" max="15" value="4" >
          Z kim?
-         <select>
+         <select id="rodzaj">
             <option value="0">Komputer</option>
             <option value="1">Inny gracz</option>
+            <option value="2">Mecz komputerów</option>
          </select>
+         Do ilu:<input id="doIlu" type="number" value="5" min="1">
          Silnik1:
          Głębokość:<input id="depth" type="number" value="4" min="0">
          Algorytm:
@@ -67,6 +69,20 @@
 
         </div>
     </div>
+     <div class="row">
+                 <div  class="points col-sm-2">
+                       Wynik meczu:
+                 </div>
+                <div id="score0" class="points col-sm-1">
+                    0
+               </div>
+               <div class=" points col-sm-1">
+                :
+               </div>
+               <div id="score1" class="points col-sm-1">
+                    0
+               </div>
+        </div>
   </div>
 
 

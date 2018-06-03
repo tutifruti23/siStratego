@@ -5,11 +5,20 @@ $(function(){
         var depth=document.getElementById("depth").value;
         var isMinMax=document.getElementById("minMax").value;
         var eval=document.getElementById("eval").value
+        var depth1=document.getElementById("depth1").value;
+        var isMinMax1=document.getElementById("minMax1").value;
+        var eval1=document.getElementById("eval1").value
+        var rodzaj=document.getElementById("rodzaj").value;
+        var doIlu=document.getElementById("doIlu").value;
         gra=new Game($size);
-        gra.initBoard();
+        gra.doIlu=doIlu;
+        gra.rodzaj=rodzaj;
+
+        gra.allPoints=4*$size*$size-4;
         gra.engine0.depth=depth;
         gra.engine0.isMinMax=isMinMax;
         gra.engine0.eval=eval;
+        gra.initBoard();
         gra.initGame();
         gra.load();
     });
@@ -20,13 +29,19 @@ function Engine(d,e,imm){
     this.isMinMax=imm;
 }
 function Game(size){
+    this.score0=0;
+    this.score1=0;
+    this.rodzaj=0;
+    this.doIlu=5;
     this.pts0=0;
     this.pts1=0;
     this.size=size;
+    this.allPoints=32;
     this.turn=0;
     this.player=0;
     this.position={};
     this.engine0=new Engine(0,0,0);
+    this.engine1=new Engine(0,0,0);
     this.analisis=0;
     this.initBoard=function(){
         for(var i=0;i<size*size;i++){
@@ -41,6 +56,7 @@ function Game(size){
             }
             $table.append("</tr>");
         }
+
     };
     this.initGame=function () {
         var handle=this;
@@ -52,6 +68,17 @@ function Game(size){
                 }
             });
         });
+        if(this.rodzaj==2){
+            this.compMove(this.engine0);
+        }
+    };
+    this.nextGame=function(){
+      this.pts0=0;
+      this.pts1=0;
+      this.turn=0;
+      this.initBoard();
+      this.initGame();
+      this.load();
     };
     this.move=function(move) {
         size=parseInt(this.size);
@@ -148,19 +175,46 @@ function Game(size){
                  liczbaPunktow=licznik+liczbaPunktow;
              }
             //dodanie punktow
-            if(this.turn==0){
 
-                this.pts0+=liczbaPunktow;
-                this.turn=1;
+                if(this.turn==0){
+
+                    this.pts0+=liczbaPunktow;
+                    this.turn=1;
+                }
+                else{
+                    this.pts1+=liczbaPunktow;
+                    this.turn=0;
+                }
+            if(this.pts0+this.pts1<this.allPoints){
+                 if(this.rodzaj==0){
+                     if(this.turn!=this.player){
+                         this.compMove(this.engine0);
+
+                     }
+                 }
+                 else if(this.rodzaj==1){
+                     this.player=this.turn;
+                 }
+                 else{
+                    if(this.turn==0){
+                        this.compMove(this.engine0);
+                    }else {
+                        this.compMove(this.engine1);
+
+                    }
+                 }
             }
             else{
-                this.pts1+=liczbaPunktow;
-                this.turn=0;
-            }
-            if(this.turn!=this.player){
-                this.compMove(this.engine0);
+                 if(this.pts0>this.pts1)
+                     this.score0++;
+                 else if(this.pts1>this.pts0)
+                     this.score1++;
 
+
+                 if(this.score0<this.doIlu&&this.score1<this.doIlu)
+                    this.nextGame();
             }
+
         }
     };
     this.load=function(){
@@ -173,8 +227,10 @@ function Game(size){
                 $(this).css("background","gray");
             }
         });
-        $("#pts0").html("").html(handle.pts0);
-        $("#pts1").html("").html(handle.pts1);
+        $("#pts0").html(handle.pts0);
+        $("#pts1").html(handle.pts1);
+        $("#score0").html(handle.score0);
+        $("#score1").html(handle.score1);
     }
     this.compMove=function(engine){
         var handle=this;
